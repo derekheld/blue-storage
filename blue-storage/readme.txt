@@ -2,9 +2,9 @@
 Contributors: derekheld
 Tags: Microsoft, Microsoft Azure, Azure Storage, Azure, Media Files, Upload, Blob
 Requires at least: 2.8.0
-Tested up to: 4.4.2
+Tested up to: 4.5
 
-Stable tag: 1.2.0
+Stable tag: 2.0.0
 
 Blue Storage for Microsoft Azure allows you to use Azure Storage to host files for your WordPress powered blog.
 
@@ -43,8 +43,11 @@ directory after uploading through SFTP or similar means.
 8. (Optional) Do this before any uploads! Set the caching max-age value for uploads. This is specified in seconds.
 
 9. (Optional) Use the "Copy To Azure" ability to copy all files not in Azure to your Azure Storage container.
+ 
 
 == Changelog ==
+= 2.0.0 =
+* Complete rewrite of plugin
 
 = 1.2.0 =
 * Added new option to set the cache control max-age value
@@ -102,4 +105,4 @@ Yes! Just edit the blue-storage-config.php file and change true to false for any
 This plugin does not support "Zone Redundant" storage accounts at this time.
 
 == License ==
-This code released under the terms of the New BSD License (BSD).
+This plugin is released under the <a href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 license</a>.
