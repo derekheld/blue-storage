@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Derek
- * Date: 4/3/2016
- * Time: 10:17 AM
+ * Constants used throughout the plugin
+ *
+ * @package   Blue Storage
+ * @author    Derek Held
+ * @link      https://wordpress.org/plugins/blue-storage/
  */
 
 namespace BlueStorage;

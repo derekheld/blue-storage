@@ -4,7 +4,6 @@
  *
  * @package   Blue Storage
  * @author    Derek Held
- * @license   Creative Commons Attribution 4.0 (http://creativecommons.org/licenses/by/4.0/)
  * @link      https://wordpress.org/plugins/blue-storage/
  */
 
