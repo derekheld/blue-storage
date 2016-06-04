@@ -1,0 +1,28 @@
+#blue-storage-red-button {
+    background:#cc0000;
+    color:white;
+    border-radius:3px;
+    border-color:#f20000;
+}
+
+#blue-storage-green-button {
+    background:#128700;
+    color:white;
+    border-radius:3px;
+    border-color:#16a300;
+}
+
+#blue-storage-notice {
+    margin:10px;
+    color:red;
+}
+
+#blue-storage-warning {
+    color: red;
+    font-weight: bold;
+}
+
+#blue-storage-progress-container {
+    width:500px;
+    border:1px solid #ccc;
+}
