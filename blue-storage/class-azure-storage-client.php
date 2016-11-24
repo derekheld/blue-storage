@@ -83,14 +83,38 @@ class AzureStorageClient
      * Uploads a block as part of a blob
      *
      * @param string $blobName SQL query result object
-     *
+     * @param $blockID
      * @param mixed $content Whatever content is to be uploaded
-     *
      * @return bool true on success, false on error
+     *
+     * @throws \Exception
      */
-    private function put_block( $blobName, $content )
+    private function put_block( $blobName, $blockID, $content )
     {
-        //Send a block to Azure to be commit
+        //Send a block to Azure to be committed as part of a blob
+        $uri = self::get_uri( $blobName, array('comp' => 'block', 'blockid' => $blockID) );
+        $requestID = uniqid('', true);
+        $date = gmdate( 'D, d M Y H:i:s T', time() );
+        $response = \Httpful\Request::put($uri)
+                            ->addHeaders(
+                                array(
+                                    'Authorization' => $this->create_signature(),
+                                    'x-ms-date' => $date,
+                                    'Content-Length' => strlen( $content ),
+                                    'Content-MD5' => md5( $content ),
+                                    'x-ms-client-request-id' => $requestID,
+                                )
+                            )
+                            ->body( $content )
+                            ->send();
+        if( $response->code != 201 )
+        {
+            throw new \Exception( 'Unable to put block. Request ID: '.$requestID, $response->code );
+        }
+        else
+        {
+            return true;
+        }
     }
 
     /**
@@ -141,7 +165,7 @@ class AzureStorageClient
     // Returns a string ready to be inserted as a header.
     // Follows http://bit.ly/1YdhvsY
     // Returns false if the minimum required info isn't there
-    public function create_signature ( $auth_array )
+    private function create_signature ( $auth_array )
     {
         // Verify we have the minimum needed
         if( $auth_array['httpMethod'] == '' || $auth_array['CanonicalizedHeaders'] == '' || $auth_array['CanonicalizedResource'] == '' )
@@ -170,7 +194,7 @@ class AzureStorageClient
     }
 
     //Creates empty array with all keys needed to generate a request signature.
-    public function create_auth_array ( )
+    private function create_auth_array ( )
     {
         return array( 'httpMethod' => '',
                         'contentEncoding' => '',
