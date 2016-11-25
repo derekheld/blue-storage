@@ -234,7 +234,7 @@ class AzureStorageClient
     }
 
     // Returns a string ready to be inserted as a header.
-    // Follows http://bit.ly/1YdhvsY
+    // Follows http://bit.ly/2fdFg8E
     // Returns false if the minimum required info isn't there
     private function create_authorization_header ( $request_array )
     {
