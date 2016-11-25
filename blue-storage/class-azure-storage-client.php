@@ -17,7 +17,7 @@ class AzureStorageClient
 
     const BLOB_URL = '.blob.core.windows.net';
     const AUTH_TYPE = 'SharedKey';
-    const X_MS_VERSION = '2015-04-05';
+    const X_MS_VERSION = '2015-12-11';
 
     /**
      * Constructor
