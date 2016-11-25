@@ -16,6 +16,7 @@ class AzureStorageClient
     private $key = '';
 
     const BLOB_URL = '.blob.core.windows.net';
+    const AUTH_TYPE = 'SharedKey';
 
     /**
      * Constructor
@@ -39,6 +40,11 @@ class AzureStorageClient
         {
             $this->account = $account;
         }
+    }
+
+    public function class_get_account( )
+    {
+        return $this->account;
     }
 
     public function class_set_container( $container )
@@ -80,6 +86,58 @@ class AzureStorageClient
     }
 
     /**
+     * Generates the canonicalized string of x-ms- headers for signature creation
+     *
+     * @param array $headers key => value pairs of all x-ms- headers specified in the request
+     *
+     * @return string canonicalized headers ready for signature generation
+     */
+    private function get_canonicalized_headers( $headers )
+    {
+        // Azure requires the headers to be chained in lexicographical order
+        $headers['x-ms-version'] = \BlueStorage\BlueStorageConst::X_MS_VERSION;
+        $headers = ksort( $headers );
+        foreach( $headers as $key => $value )
+        {
+            $canonicalized .= $key . ':' . $value . '\n';
+        }
+
+        return $canonicalized;
+    }
+
+    /**
+     * Generates the canonicalized resource URI which is just the URI with the domain removed and no query parameters
+     *
+     * @param string $uri the full request URI
+     *
+     * @return string canonicalized URI ready for signature generation
+     */
+    private function get_canonicalized_resource ( $uri )
+    {
+        return strstr( strstr($uri, '/'), '?', true );
+    }
+
+    /**
+     * Generates the canonicalized query parameters
+     *
+     * @param string $uri the full request URI
+     *
+     * @return string canonicalized query parameters ready for signature generation
+     */
+    private function get_canonicalized_query ( $uri )
+    {
+        $parameters = explode( '&', ltrim(strstr($uri, '?'), '?') );
+
+        foreach( $parameters as $parameter )
+        {
+            $canonicalized .= str_replace( '=', ':' $parameter ) . '\n';
+        }
+
+        // We can't do a rtrim because we have a multicharacter string to trim off
+        return substr( $canonicalized, 0, strrpos($canonicalized,'\n') );
+    }
+
+    /**
      * Uploads a block as part of a blob
      *
      * @param string $blobName SQL query result object
@@ -93,15 +151,26 @@ class AzureStorageClient
     {
         //Send a block to Azure to be committed as part of a blob
         $uri = self::get_uri( $blobName, array('comp' => 'block', 'blockid' => $blockID) );
+
+        //Prepare all headers to be used for the request and for generating the signature
         $requestID = uniqid('', true);
-        $date = gmdate( 'D, d M Y H:i:s T', time() );
+        $requestHeaders = $this->create_request_array();
+        $requestHeaders['Date'] = gmdate( 'D, d M Y H:i:s T', time() );
+        $requestHeaders['Content-MD5'] = md5( $content );
+        $requestHeaders['Content-Length'] = strlen( $content );
+        $requestHeaders['CanonicalizedHeaders'] = $this->get_canonicalized_headers(
+                                                    array( 'x-ms-date' => $requestHeaders['Date'],
+                                                           'x-ms-client-request-id' => $requestID) );
+        $requestHeaders['CanonicalizedResource'] = $this->get_canonicalized_resource( $uri );
+        $requestHeaders['CanonicalizedQuery'] = $this->get_canonicalized_query( $uri );
+
         $response = \Httpful\Request::put($uri)
                             ->addHeaders(
                                 array(
-                                    'Authorization' => $this->create_signature(),
-                                    'x-ms-date' => $date,
-                                    'Content-Length' => strlen( $content ),
-                                    'Content-MD5' => md5( $content ),
+                                    'Authorization' => $this->create_authorization_header( $requestHeaders ),
+                                    'x-ms-date' => $requestHeaders['Date'],
+                                    'Content-Length' => $requestHeaders['Content-Length'],
+                                    'Content-MD5' => $requestHeaders['Content-MD5'],
                                     'x-ms-client-request-id' => $requestID,
                                 )
                             )
@@ -165,50 +234,51 @@ class AzureStorageClient
     // Returns a string ready to be inserted as a header.
     // Follows http://bit.ly/1YdhvsY
     // Returns false if the minimum required info isn't there
-    private function create_signature ( $auth_array )
+    private function create_authorization_header ( $request_array )
     {
         // Verify we have the minimum needed
-        if( $auth_array['httpMethod'] == '' || $auth_array['CanonicalizedHeaders'] == '' || $auth_array['CanonicalizedResource'] == '' )
+        if( $request_array['httpMethod'] == '' || $request_array['CanonicalizedHeaders'] == '' || $request_array['CanonicalizedResource'] == '' )
         {
             return false;
         }
 
-        $stringToSign = $auth_array['httpMethod'] . '\n' .
-                        $auth_array['Content-Encoding'] . "\n" .
-                        $auth_array['Content-Language'] . "\n" .
-                        $auth_array['Content-Length'] . "\n" .
-                        $auth_array['Content-MD5'] . '\n' .
-                        $auth_array['Content-Type'] . "\n" .
-                        $auth_array['Date'] . "\n" .
-                        $auth_array['If-Modified-Since'] . "\n" .
-                        $auth_array['If-Match'] . "\n" .
-                        $auth_array['If-None-Match'] . "\n" .
-                        $auth_array['If-Unmodified-Since'] . "\n" .
-                        $auth_array['Range'] . "\n" .
-                        $auth_array['CanonicalizedHeaders'] . '\n' .
-                        $auth_array['CanonicalizedResource'];
+        $stringToSign = $request_array['httpMethod'] . "\n" .
+                        $request_array['Content-Encoding'] . "\n" .
+                        $request_array['Content-Language'] . "\n" .
+                        $request_array['Content-Length'] . "\n" .
+                        $request_array['Content-MD5'] . "\n" .
+                        $request_array['Content-Type'] . "\n" .
+                        $request_array['Date'] . "\n" .
+                        $request_array['If-Modified-Since'] . "\n" .
+                        $request_array['If-Match'] . "\n" .
+                        $request_array['If-None-Match'] . "\n" .
+                        $request_array['If-Unmodified-Since'] . "\n" .
+                        $request_array['Range'] . "\n" .
+                        $request_array['CanonicalizedHeaders'] . "\n" .
+                        $request_array['CanonicalizedResource'] . "\n" .
+                        $request_array['CanonicalizedQuery'];
 
-        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $this->class_get_key(), true));
-
-        return $signature;
+        return self::AUTH_TYPE . ' ' . $this->class_get_account() . ':' . base64_encode(hash_hmac('sha256', $stringToSign, $this->class_get_key(), true));
     }
 
-    //Creates empty array with all keys needed to generate a request signature.
-    private function create_auth_array ( )
+    //Creates empty array with all header options for creating a valid request
+    private function create_request_array ( )
     {
         return array( 'httpMethod' => '',
-                        'contentEncoding' => '',
-                        'contentLanguage' => '',
-                        'contentLength' => '',
-                        'contentMD5' => '',
-                        'contentType' => '',
-                        'date' => '',
-                        'ifModifiedSince' => '',
-                        'ifMatch' => '',
-                        'ifNoneMatch' => '',
+                        'Content-Encoding' => '',
+                        'Content-Language' => '',
+                        'Content-Length' => '',
+                        'Content-MD5' => '',
+                        'Content-Type' => '',
+                        'Date' => '',
+                        'If-Modified-Since' => '',
+                        'If-Match' => '',
+                        'If-None-Match' => '',
                         'ifUnmodifiedSince' => '',
-                        'range' => '',
+                        'If-Unmodified-Since' => '',
+                        'Range' => '',
                         'CanonicalizedHeaders' => '',
-                        'CanonicalizedResource' => '' );
+                        'CanonicalizedResource' => '',
+                        'CanonicalizedQuery' => '' );
     }
 }
