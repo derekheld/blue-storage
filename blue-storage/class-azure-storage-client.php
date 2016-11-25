@@ -131,7 +131,7 @@ class AzureStorageClient
         $canonicalized = '';
         foreach( $parameters as $parameter )
         {
-            $canonicalized .= str_replace( '=', ':' $parameter ) . '\n';
+            $canonicalized .= str_replace( '=', ':', $parameter ) . '\n';
         }
 
         // We can't do a rtrim because we have a multicharacter string to trim off
