@@ -97,6 +97,7 @@ class AzureStorageClient
         // Azure requires the headers to be chained in lexicographical order
         $headers['x-ms-version'] = \BlueStorage\BlueStorageConst::X_MS_VERSION;
         $headers = ksort( $headers );
+        $canonicalized = '';
         foreach( $headers as $key => $value )
         {
             $canonicalized .= $key . ':' . $value . '\n';
@@ -127,7 +128,7 @@ class AzureStorageClient
     private function get_canonicalized_query ( $uri )
     {
         $parameters = explode( '&', ltrim(strstr($uri, '?'), '?') );
-
+        $canonicalized = '';
         foreach( $parameters as $parameter )
         {
             $canonicalized .= str_replace( '=', ':' $parameter ) . '\n';
