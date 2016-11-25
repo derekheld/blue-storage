@@ -157,6 +157,7 @@ class AzureStorageClient
         //Prepare all headers to be used for the request and for generating the signature
         $requestID = uniqid('', true);
         $requestHeaders = $this->create_request_array();
+        $requestHeaders['httpMethod'] = 'PUT';
         $requestHeaders['Date'] = gmdate( 'D, d M Y H:i:s T', time() );
         $requestHeaders['Content-MD5'] = md5( $content );
         $requestHeaders['Content-Length'] = strlen( $content );
