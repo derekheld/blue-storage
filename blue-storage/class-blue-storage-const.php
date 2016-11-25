@@ -17,6 +17,4 @@ class BlueStorageConst
     const ALLOW_DELETE_ALL = true;
     const ALLOW_COPY_TO_AZURE = true;
     const ALLOW_DEFAULT_UPLOAD_CHANGE = true;
-
-    const X_MS_VERSION = '2015-04-05';
 }

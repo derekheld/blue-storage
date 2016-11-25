@@ -20,6 +20,6 @@ require_once ( 'libraries/httpful.phar' ); // Include here because we make a tem
 $template = \Httpful\Request::init()
                 ->strictSSL(true)
                 ->expects('application/xml')
-                ->addHeaders( array('x-ms-version' => \BlueStorage\BlueStorageConst::X_MS_VERSION) );
+                ->addHeaders( array('x-ms-version' => \BlueStorage\AzureStorageClient::X_MS_VERSION) );
 
 \Httpful\Request::ini($template);

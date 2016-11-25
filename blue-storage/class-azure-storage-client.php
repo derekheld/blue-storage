@@ -17,6 +17,7 @@ class AzureStorageClient
 
     const BLOB_URL = '.blob.core.windows.net';
     const AUTH_TYPE = 'SharedKey';
+    const X_MS_VERSION = '2015-04-05';
 
     /**
      * Constructor
@@ -95,7 +96,7 @@ class AzureStorageClient
     private function get_canonicalized_headers( $headers )
     {
         // Azure requires the headers to be chained in lexicographical order
-        $headers['x-ms-version'] = \BlueStorage\BlueStorageConst::X_MS_VERSION;
+        $headers['x-ms-version'] = self::X_MS_VERSION;
         $headers = ksort( $headers );
         $canonicalized = '';
         foreach( $headers as $key => $value )
