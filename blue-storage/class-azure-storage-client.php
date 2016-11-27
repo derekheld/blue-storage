@@ -8,16 +8,16 @@
  */
 
 namespace BlueStorage;
+require_once( 'class-azure-headers.php' );
 
 class AzureStorageClient
 {
+    const BLOB_URL = '.blob.core.windows.net';
+    const X_MS_VERSION = '2015-12-11';
+
     protected $account = '';
     protected $container = '';
     protected $key = '';
-
-    const BLOB_URL = '.blob.core.windows.net';
-    const AUTH_TYPE = 'SharedKey';
-    const X_MS_VERSION = '2015-12-11';
 
     /**
      * Constructor
@@ -87,59 +87,6 @@ class AzureStorageClient
     }
 
     /**
-     * Generates the canonicalized string of x-ms- headers for signature creation
-     *
-     * @param array $headers key => value pairs of all x-ms- headers specified in the request
-     *
-     * @return string canonicalized headers ready for signature generation
-     */
-    protected function get_canonicalized_headers( $headers )
-    {
-        // Azure requires the headers to be chained in lexicographical order
-        $headers['x-ms-version'] = self::X_MS_VERSION;
-        $headers = ksort( $headers );
-        $canonicalized = '';
-        foreach( $headers as $key => $value )
-        {
-            $canonicalized .= $key . ':' . $value . '\n';
-        }
-
-        return $canonicalized;
-    }
-
-    /**
-     * Generates the canonicalized resource URI which is just the URI with the domain removed and no query parameters
-     *
-     * @param string $uri the full request URI
-     *
-     * @return string canonicalized URI ready for signature generation
-     */
-    protected function get_canonicalized_resource ( $uri )
-    {
-        return strstr( strstr($uri, '/'), '?', true );
-    }
-
-    /**
-     * Generates the canonicalized query parameters
-     *
-     * @param string $uri the full request URI
-     *
-     * @return string canonicalized query parameters ready for signature generation
-     */
-    protected function get_canonicalized_query ( $uri )
-    {
-        $parameters = explode( '&', ltrim(strstr($uri, '?'), '?') );
-        $canonicalized = '';
-        foreach( $parameters as $parameter )
-        {
-            $canonicalized .= str_replace( '=', ':', $parameter ) . '\n';
-        }
-
-        // We can't do a rtrim because we have a multicharacter string to trim off
-        return substr( $canonicalized, 0, strrpos($canonicalized,'\n') );
-    }
-
-    /**
      * Uploads a block as part of a blob
      *
      * @param string $blobName SQL query result object
@@ -155,33 +102,25 @@ class AzureStorageClient
         $uri = self::get_uri( $blobName, array('comp' => 'block', 'blockid' => $blockID) );
 
         //Prepare all headers to be used for the request and for generating the signature
-        $requestID = uniqid('', true);
-        $requestHeaders = $this->create_request_array();
-        $requestHeaders['httpMethod'] = 'PUT';
-        $requestHeaders['Date'] = gmdate( 'D, d M Y H:i:s T', time() );
-        $requestHeaders['Content-MD5'] = md5( $content );
-        $requestHeaders['Content-Length'] = strlen( $content );
-        $requestHeaders['CanonicalizedHeaders'] = $this->get_canonicalized_headers(
-                                                    array( 'x-ms-date' => $requestHeaders['Date'],
-                                                           'x-ms-client-request-id' => $requestID) );
-        $requestHeaders['CanonicalizedResource'] = $this->get_canonicalized_resource( $uri );
-        $requestHeaders['CanonicalizedQuery'] = $this->get_canonicalized_query( $uri );
+        $headers = new AzureHeaders( self::X_MS_VERSION, $uri, 'PUT' );
+        $headers->set_header( 'Content-MD5', md5($content) );
+        $headers->set_header( 'Content-Length', strlen($content) );
 
         $response = \Httpful\Request::put($uri)
                             ->addHeaders(
                                 array(
-                                    'Authorization' => $this->create_authorization_header( $requestHeaders ),
-                                    'x-ms-date' => $requestHeaders['Date'],
-                                    'Content-Length' => $requestHeaders['Content-Length'],
-                                    'Content-MD5' => $requestHeaders['Content-MD5'],
-                                    'x-ms-client-request-id' => $requestID,
+                                    'Authorization' => $headers->make_authorization_header( self::class_get_account(), self::class_get_key() ),
+                                    'Date' => $headers->get_header( 'Date' ),
+                                    'Content-Length' => $headers->get_header( 'Content-Length' ),
+                                    'Content-MD5' => $headers->get_header( 'Content-MD5' ),
+                                    'x-ms-client-request-id' => $headers->get_header( 'x-ms-client-request-id' ),
                                 )
                             )
                             ->body( $content )
                             ->send();
         if( $response->code != 201 )
         {
-            throw new \Exception( 'Unable to put block. Request ID: '.$requestID, $response->code );
+            throw new \Exception( 'Unable to put block. Request ID: '.$headers->get_header( 'x-ms-client-request-id' ), $response->code );
         }
         else
         {
@@ -232,42 +171,5 @@ class AzureStorageClient
         {
             return $blobName;
         }
-    }
-
-    // Returns a string ready to be inserted as a header.
-    // Follows http://bit.ly/2fdFg8E
-    // Returns false if the minimum required info isn't there
-    protected function create_authorization_header ( $request_array )
-    {
-        // Verify we have the minimum needed
-        if( $request_array['httpMethod'] == '' || $request_array['CanonicalizedHeaders'] == '' || $request_array['CanonicalizedResource'] == '' )
-        {
-            return false;
-        }
-
-        $stringToSign = implode( '\n', $request_array );
-
-        return self::AUTH_TYPE . ' ' . $this->class_get_account() . ':' . base64_encode(hash_hmac('sha256', $stringToSign, $this->class_get_key(), true));
-    }
-
-    //Creates empty array with all header options for creating a valid request
-    protected function create_request_array ( )
-    {
-        return array( 'httpMethod' => '',
-                        'Content-Encoding' => '',
-                        'Content-Language' => '',
-                        'Content-Length' => '',
-                        'Content-MD5' => '',
-                        'Content-Type' => '',
-                        'Date' => '',
-                        'If-Modified-Since' => '',
-                        'If-Match' => '',
-                        'If-None-Match' => '',
-                        'ifUnmodifiedSince' => '',
-                        'If-Unmodified-Since' => '',
-                        'Range' => '',
-                        'CanonicalizedHeaders' => '',
-                        'CanonicalizedResource' => '',
-                        'CanonicalizedQuery' => '' );
     }
 }
