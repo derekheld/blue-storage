@@ -37,7 +37,7 @@ class AzureStorageClient
 
     public function class_set_account( $account )
     {
-        if( preg_match( '[a-z0-9]*' ) )
+        if( preg_match( '/[a-z0-9]*/', $account ) )
         {
             $this->account = $account;
         }
