@@ -245,21 +245,7 @@ class AzureStorageClient
             return false;
         }
 
-        $stringToSign = $request_array['httpMethod'] . "\n" .
-                        $request_array['Content-Encoding'] . "\n" .
-                        $request_array['Content-Language'] . "\n" .
-                        $request_array['Content-Length'] . "\n" .
-                        $request_array['Content-MD5'] . "\n" .
-                        $request_array['Content-Type'] . "\n" .
-                        $request_array['Date'] . "\n" .
-                        $request_array['If-Modified-Since'] . "\n" .
-                        $request_array['If-Match'] . "\n" .
-                        $request_array['If-None-Match'] . "\n" .
-                        $request_array['If-Unmodified-Since'] . "\n" .
-                        $request_array['Range'] . "\n" .
-                        $request_array['CanonicalizedHeaders'] . "\n" .
-                        $request_array['CanonicalizedResource'] . "\n" .
-                        $request_array['CanonicalizedQuery'];
+        $stringToSign = implode( '\n', $request_array );
 
         return self::AUTH_TYPE . ' ' . $this->class_get_account() . ':' . base64_encode(hash_hmac('sha256', $stringToSign, $this->class_get_key(), true));
     }
