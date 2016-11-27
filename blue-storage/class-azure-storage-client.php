@@ -11,9 +11,9 @@ namespace BlueStorage;
 
 class AzureStorageClient
 {
-    private $account = '';
-    private $container = '';
-    private $key = '';
+    protected $account = '';
+    protected $container = '';
+    protected $key = '';
 
     const BLOB_URL = '.blob.core.windows.net';
     const AUTH_TYPE = 'SharedKey';
