@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: derek
- * Date: 11/27/2016
- * Time: 8:26 AM
+ * Used for managing headers for making requests to Azure
+ *
+ * @package   Blue Storage
+ * @author    Derek Held
+ * @link      https://wordpress.org/plugins/blue-storage/
  */
 
 namespace BlueStorage;
@@ -48,6 +49,14 @@ class AzureHeaders
         self::set_uri( $uri );
     }
 
+    /**
+     * Sets a new or updates an existing header
+     *
+     * @param $header
+     * @param $value
+     *
+     * @return bool returns true on update
+     */
     public function set_header($header, $value)
     {
         if (array_key_exists($header, $this->authArray)) {
@@ -60,6 +69,13 @@ class AzureHeaders
         return true;
     }
 
+    /**
+     * Returns the value for a given header name
+     *
+     * @param $header
+     *
+     * @return bool|string returns string of value if it exists, false if the header does not exist
+     */
     public function get_header($header)
     {
         if (array_key_exists($header, $this->authArray)) {
@@ -73,6 +89,12 @@ class AzureHeaders
         return false;
     }
 
+    /**
+     * Sets the URI for the request, which is needed to generate an authorization header
+     *
+     * @param $uri
+     *
+     */
     public function set_uri($uri)
     {
         $this->uri = $uri;

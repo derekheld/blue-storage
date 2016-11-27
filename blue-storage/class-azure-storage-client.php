@@ -35,6 +35,12 @@ class AzureStorageClient
         $this->class_set_container( $container );
     }
 
+    /**
+     * Sets a new account name as long as it is valid
+     *
+     * @param string $account
+     *
+     */
     public function class_set_account( $account )
     {
         if( preg_match( '/[a-z0-9]*/', $account ) )
@@ -43,26 +49,54 @@ class AzureStorageClient
         }
     }
 
+    /**
+     * Returns the account name set when instantiated
+     *
+     * @return string
+     */
     public function class_get_account( )
     {
         return $this->account;
     }
 
+    /**
+     * Sets the container for which operations will be performed on
+     *
+     * @param string $container
+     */
     public function class_set_container( $container )
     {
         $this->container = $container;
     }
 
+    /**
+     * Sets the secret key for accessing the service
+     *
+     * @param string $key
+     */
     public function class_set_key( $key )
     {
         $this->key = $key;
     }
 
+    /**
+     * Returns the secret key for accessing the service
+     *
+     * @return string
+     */
     public function class_get_key( )
     {
         return $this->key;
     }
 
+    /**
+     * Creates a URI for submitting a request to the Azure API, it purposefully does not set the scheme
+     *
+     * @param string $blobName not required when performing an operation against a container
+     * @param array $parameters request may or may not have these
+     *
+     * @return string completed URI
+     */
     public function get_uri( $blobName = '', $parameters = array() )
     {
         $uri = $this->account.'.'.self::BLOB_URL.'/'.$this->container;
@@ -133,7 +167,7 @@ class AzureStorageClient
      *
      * @param string $blobName SQL query result object
      *
-     * @param array $blobList List of UUIDs for blocks
+     * @param array $blockList List of UUIDs for blocks
      *
      * @return bool true on success, false on error
      */
