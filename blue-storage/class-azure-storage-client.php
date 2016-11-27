@@ -93,7 +93,7 @@ class AzureStorageClient
      *
      * @return string canonicalized headers ready for signature generation
      */
-    private function get_canonicalized_headers( $headers )
+    protected function get_canonicalized_headers( $headers )
     {
         // Azure requires the headers to be chained in lexicographical order
         $headers['x-ms-version'] = self::X_MS_VERSION;
@@ -114,7 +114,7 @@ class AzureStorageClient
      *
      * @return string canonicalized URI ready for signature generation
      */
-    private function get_canonicalized_resource ( $uri )
+    protected function get_canonicalized_resource ( $uri )
     {
         return strstr( strstr($uri, '/'), '?', true );
     }
@@ -126,7 +126,7 @@ class AzureStorageClient
      *
      * @return string canonicalized query parameters ready for signature generation
      */
-    private function get_canonicalized_query ( $uri )
+    protected function get_canonicalized_query ( $uri )
     {
         $parameters = explode( '&', ltrim(strstr($uri, '?'), '?') );
         $canonicalized = '';
@@ -149,7 +149,7 @@ class AzureStorageClient
      *
      * @throws \Exception
      */
-    private function put_block( $blobName, $blockID, $content )
+    protected function put_block( $blobName, $blockID, $content )
     {
         //Send a block to Azure to be committed as part of a blob
         $uri = self::get_uri( $blobName, array('comp' => 'block', 'blockid' => $blockID) );
@@ -198,7 +198,7 @@ class AzureStorageClient
      *
      * @return bool true on success, false on error
      */
-    private function put_block_list( $blobName, $blockList )
+    protected function put_block_list( $blobName, $blockList )
     {
 
     }
@@ -237,7 +237,7 @@ class AzureStorageClient
     // Returns a string ready to be inserted as a header.
     // Follows http://bit.ly/2fdFg8E
     // Returns false if the minimum required info isn't there
-    private function create_authorization_header ( $request_array )
+    protected function create_authorization_header ( $request_array )
     {
         // Verify we have the minimum needed
         if( $request_array['httpMethod'] == '' || $request_array['CanonicalizedHeaders'] == '' || $request_array['CanonicalizedResource'] == '' )
@@ -251,7 +251,7 @@ class AzureStorageClient
     }
 
     //Creates empty array with all header options for creating a valid request
-    private function create_request_array ( )
+    protected function create_request_array ( )
     {
         return array( 'httpMethod' => '',
                         'Content-Encoding' => '',
