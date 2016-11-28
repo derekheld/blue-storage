@@ -165,15 +165,42 @@ class AzureStorageClient
     /**
      * Commits a list of blocks for a given blob
      *
-     * @param string $blobName SQL query result object
-     *
+     * @param string $blobName unique blob name for which has blocks in uncommitted state to be committed
      * @param array $blockList List of UUIDs for blocks
      *
      * @return bool true on success, false on error
+     *
+     * @throws \Exception
      */
-    protected function put_block_list( $blobName, $blockList )
+    protected function put_block_list( $blobName, $blockList, $cacheControl, $contentType, $contentMD5 )
     {
+        $uri = self::get_uri( $blobName, array('comp' => 'block') );
 
+        $content = '<?xml version="1.0" encoding="utf-8"?><BlockList><Uncommitted></Uncommitted>';
+        $content .= implode( '</Uncommitted><Uncommitted>', $blockList );
+        $content = substr( $content, 0, strrpos($content,'<Uncommitted>') ) . '</BlockList>';
+
+        $headers = new AzureHeaders( self::X_MS_VERSION, $uri, 'PUT' );
+        $headers->set_header( 'Content-MD5', md5($content) );
+        $headers->set_header( 'Content-Length', strlen($content) );
+        $headers->set_header( 'Content-Type', 'text/plain; charset=UTF-8' );
+        $headers->set_header( 'x-ms-cache-control', $cacheControl );
+        $headers->set_header( 'x-ms-blob-content-type', $contentType );
+        $headers->set_header( 'x-ms-blob-content-md5', $contentMD5 );
+
+        $response = \Httpful\Request::put($uri)
+                            ->addHeaders( $headers->get_all_set_headers() )
+                            ->body( $content )
+                            ->send();
+
+        if( $response->code != 201 )
+        {
+            throw new \Exception( 'Unable to put block. Request ID: '.$headers->get_header( 'x-ms-client-request-id' ), $response->code );
+        }
+        else
+        {
+            return true;
+        }
     }
 
     /**
