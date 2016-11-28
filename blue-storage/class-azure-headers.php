@@ -103,7 +103,7 @@ class AzureHeaders
 
         foreach( $this->requestHeaders as $key => $value )
         {
-            if( $value !== '' and !preg_match('/^Canonicalized/', $key) )
+            if( $value !== '' and !preg_match('/^Canonicalized/', $key) and $key !== 'httpMethod' )
             {
                 $setHeaders[$key] = $value;
             }
