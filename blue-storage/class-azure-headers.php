@@ -90,6 +90,26 @@ class AzureHeaders
     }
 
     /**
+     * Assmbles an array of all headers that have been set except for canonicalized as they aren't used for requests
+     *
+     * @return array
+     */
+    public function get_all_set_headers( )
+    {
+        $setHeaders = $this->requestHeaders;
+
+        foreach( $this->requestHeaders as $key => $value )
+        {
+            if( $value !== '' and !preg_match('/^Canonicalized/', $key) )
+            {
+                $setHeaders[$key] = $value;
+            }
+        }
+
+        return $setHeaders;
+    }
+
+    /**
      * Sets the URI for the request, which is needed to generate an authorization header
      *
      * @param $uri
