@@ -92,9 +92,12 @@ class AzureHeaders
     /**
      * Assmbles an array of all headers that have been set except for canonicalized as they aren't used for requests
      *
+     * @param string $account Azure storage account
+     * @param string $key secret key for container
+     *
      * @return array
      */
-    public function get_all_set_headers( )
+    public function get_request_headers( $account, $key )
     {
         $setHeaders = $this->requestHeaders;
 
@@ -105,6 +108,8 @@ class AzureHeaders
                 $setHeaders[$key] = $value;
             }
         }
+
+        $setHeaders['Authorization'] = self::make_authorization_header( $account, $key );
 
         return $setHeaders;
     }

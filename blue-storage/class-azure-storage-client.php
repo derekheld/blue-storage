@@ -141,15 +141,7 @@ class AzureStorageClient
         $headers->set_header( 'Content-Length', strlen($content) );
 
         $response = \Httpful\Request::put($uri)
-                            ->addHeaders(
-                                array(
-                                    'Authorization' => $headers->make_authorization_header( self::class_get_account(), self::class_get_key() ),
-                                    'Date' => $headers->get_header( 'Date' ),
-                                    'Content-Length' => $headers->get_header( 'Content-Length' ),
-                                    'Content-MD5' => $headers->get_header( 'Content-MD5' ),
-                                    'x-ms-client-request-id' => $headers->get_header( 'x-ms-client-request-id' ),
-                                )
-                            )
+                            ->addHeaders( $headers->get_request_headers(self::class_get_account(), self::class_get_key()) )
                             ->body( $content )
                             ->send();
         if( $response->code != 201 )
@@ -189,7 +181,7 @@ class AzureStorageClient
         $headers->set_header( 'x-ms-blob-content-md5', $contentMD5 );
 
         $response = \Httpful\Request::put($uri)
-                            ->addHeaders( $headers->get_all_set_headers() )
+                            ->addHeaders( $headers->get_request_headers(self::class_get_account(), self::class_get_key()) )
                             ->body( $content )
                             ->send();
 
