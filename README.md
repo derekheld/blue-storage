@@ -30,4 +30,4 @@ Primary distribution is through https://wordpress.org/plugins/blue-storage/
 I highly recommend using WordPress' integrated plugin installer.
 
 ### Support
-I am happy to provide assistance to uses as I am able. Please use the support forum on the plugin's WordPress.org page.
+I am happy to provide assistance to users as I am able. Please use the support forum on the plugin's WordPress.org page.
