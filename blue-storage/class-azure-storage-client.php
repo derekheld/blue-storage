@@ -236,8 +236,6 @@ class AzureStorageClient
 
         //Commit block list
         self::put_block_list( $blobName, $blockList, $cacheControl, $contentType, $contentMD5 );
-
-        //TODO: Verify MD5 of file with blob
     }
 
     /**
