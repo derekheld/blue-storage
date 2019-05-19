@@ -196,6 +196,18 @@ class AzureStorageClient
         return $uri;
     }
 
+    /**
+     * Uploads a file to Azure Storage using the block blob method
+     *
+     * @param string $blobName unique name to upload file as
+     * @param string $path of the file to be uploaded
+     * @param integer $cacheControl number of seconds to be used for Cache-Control header
+     * @param array $metadata additional metadata to be included with the blob
+     *
+     * @return boolean
+     *
+     * @throws Exception
+     */
     public function put_block_blob( $blobName, $path, $cacheControl = NULL, $metadata = array() )
     {
         $blockList = array();
@@ -236,6 +248,8 @@ class AzureStorageClient
 
         //Commit block list
         self::put_block_list( $blobName, $blockList, $cacheControl, $contentType, $contentMD5 );
+
+        return true;
     }
 
     /**
