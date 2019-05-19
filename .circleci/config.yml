@@ -10,9 +10,9 @@ jobs:
       - image: circleci/php:latest
       - image: circleci/mariadb:latest
         command: mysqld
-          environment:
-            MYSQL_USER: blue
-            MYSQL_ALLOW_EMPTY_PASSWORD: true
+        environment:
+          MYSQL_USER: blue
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
     steps:
       - checkout
 
