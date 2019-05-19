@@ -204,7 +204,10 @@ class AzureStorageClient
         $size = filesize( $path );
         $blockList = array();
 
-        //TODO: Check if we will be able to upload file or if the block size is too small
+        if( $size > (self::class_get_block_size() * self::MAX_NUM_BLOCKS) )
+        {
+            throw new Exception( 'Block size too small to upload file ' . $path, 1 );
+        }
 
         $handle = fopen( $path, 'rb' );
         if( $handle === false )
