@@ -196,13 +196,25 @@ class AzureStorageClient
         return $uri;
     }
 
-    //TODO: put_blob? Would calculate MD5, type, etc?
-
-    public function put_block_blob( $blobName, $path, $contentMD5, $contentType, $cacheControl = NULL, $metadata = array() )
+    public function put_block_blob( $blobName, $path, $cacheControl = NULL, $metadata = array() )
     {
-        //Split up file and put blocks and then block list
-        $size = filesize( $path );
         $blockList = array();
+
+        if( $size = filesize($path) )
+        {
+            //Without size we can't calculate whether our number of blocks will exceed the limit
+            throw new Exception( 'Unable to get size of '.$path, 1 );
+        }
+
+        if( $contentType = mime_content_type($path) )
+        {
+            $contentType = '';
+        }
+
+        if( $contentMD5 = md5_file($path) )
+        {
+            $contentMD5 = '';
+        }
 
         if( $size > (self::class_get_block_size() * self::MAX_NUM_BLOCKS) )
         {
