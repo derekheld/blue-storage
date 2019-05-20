@@ -20,16 +20,15 @@ jobs:
           name: Prepare environment
           command: |
             sudo apt update
-            sudo apt install -y mariadb-client
-            sudo apt install -y libgd-dev
+            sudo apt install -qq mariadb-client libgd-dev
             curl -o wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
             chmod +x wp
             sudo mv wp /usr/local/bin
             echo $(openssl rand -hex 8) > /tmp/wp-password
             wp core download --path=wordpress
-            sudo docker-php-ext-install zip
-            sudo docker-php-ext-install gd
+            sudo docker-php-ext-install gd sockets mysqli exif
             zip -r blue-storage.zip blue-storage/
+            sudo mv /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
       - run:
           name: Setup WordPress
           command: |
