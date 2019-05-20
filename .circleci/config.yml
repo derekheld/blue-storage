@@ -37,7 +37,7 @@ jobs:
             wp config create --dbhost=127.0.0.1 --dbname=wordpress --dbuser=root --path=wordpress/
             wp config set WP_DEBUG true --path=wordpress/
             wp config set WP_DEBUG_LOG /tmp/wp-debug.log --path=wordpress/
-            wp core install --url=plugin.test --title="Blue Storage" --admin_user=blue --admin_email=blue@plugin.test --prompt=admin_password < /tmp/wp-password
+            wp core install --path=wordpress/ --url=plugin.test --title="Blue Storage" --admin_user=blue --admin_email=blue@plugin.test --prompt=admin_password < /tmp/wp-password
             wp plugin install blue-storage.zip --path=wordpress/ --activate
 
       # run tests with phpunit or codecept
