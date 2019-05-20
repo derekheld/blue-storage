@@ -20,7 +20,7 @@ jobs:
           name: Prepare environment
           command: |
             sudo apt update
-            sudo apt install -y mariadb-server
+            sudo apt install -y mariadb-client
             sudo apt install -y libgd-dev
             curl -o wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
             chmod +x wp
@@ -37,7 +37,7 @@ jobs:
             wp config create --dbhost=127.0.0.1 --dbname=wordpress --dbuser=root --path=wordpress/
             wp config set WP_DEBUG true --path=wordpress/
             wp config set WP_DEBUG_LOG /tmp/wp-debug.log --path=wordpress/
-            wp core install --path=wordpress/ --url=plugin.test --title="Blue Storage" --admin_user=blue --admin_email=blue@plugin.test --prompt=admin_password --debug < /tmp/wp-password
+            wp core install --path=wordpress/ --url=plugin.test --title="Blue Storage" --admin_user=blue --admin_email=blue@plugin.test --prompt=admin_password < /tmp/wp-password
             wp plugin install blue-storage.zip --path=wordpress/ --activate
 
       # run tests with phpunit or codecept
