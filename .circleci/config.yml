@@ -7,52 +7,39 @@ jobs:
   build:
     docker:
       # Specify the version you desire here
-      - image: circleci/php:7.3
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # Using the RAM variation mitigates I/O contention
-      # for database intensive operations.
-      # - image: circleci/mysql:5.7-ram
-      #
-      # - image: redis:2.8.19
-
+      - image: circleci/php:latest
+      - image: circleci/mariadb:latest
+        command: mysqld
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_ROOT_PASSWORD: ''
     steps:
       - checkout
 
-      - run: sudo apt update # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
-      - run: sudo docker-php-ext-install zip
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            # "composer.lock" can be used if it is committed to the repo
-            - v1-dependencies-{{ checksum "composer.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
-      - run: composer install -n --prefer-dist
-
-      - save_cache:
-          key: v1-dependencies-{{ checksum "composer.json" }}
-          paths:
-            - ./vendor
-      - restore_cache:
-          keys:
-            - node-v1-{{ checksum "package.json" }}
-            - node-v1-
-      - run: yarn install
-      - save_cache:
-          key: node-v1-{{ checksum "package.json" }}
-          paths:
-            - node_modules
-
-      # prepare the database
-      - run: touch storage/testing.sqlite
-      - run: php artisan migrate --env=testing --database=sqlite_testing --force
+      - run:
+          name: Prepare environment
+          command: |
+            sudo apt update
+            sudo apt install -qq mariadb-client libgd-dev
+            curl -o wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+            chmod +x wp
+            sudo mv wp /usr/local/bin
+            echo $(openssl rand -hex 8) > /tmp/wp-password
+            wp core download --path=wordpress
+            sudo docker-php-ext-install gd sockets mysqli exif
+            zip -r blue-storage.zip blue-storage/
+            sudo mv /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+      - run:
+          name: Setup WordPress
+          command: |
+            mysql -h 127.0.0.1 -u root -e "create database wordpress"
+            wp config create --dbhost=127.0.0.1 --dbname=wordpress --dbuser=root --path=wordpress/
+            wp config set WP_DEBUG true --path=wordpress/
+            wp config set WP_DEBUG_LOG /tmp/wp-debug.log --path=wordpress/
+            wp core install --path=wordpress/ --url=plugin.test --title="Blue Storage" --admin_user=blue --admin_email=blue@plugin.test --prompt=admin_password < /tmp/wp-password
+            wp plugin install blue-storage.zip --path=wordpress/ --activate
 
       # run tests with phpunit or codecept
       #- run: ./vendor/bin/phpunit
-      - run: ./vendor/bin/codecept build
-      - run: ./vendor/bin/codecept run
+      #- run: ./vendor/bin/codecept build
+      #- run: ./vendor/bin/codecept run
