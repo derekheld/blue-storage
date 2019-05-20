@@ -34,7 +34,6 @@ jobs:
           name: Setup WordPress
           command: |
             mysql -h 127.0.0.1 -u root -e "create database wordpress"
-            wp core download --path=wordpress
             wp config create --dbhost=127.0.0.1 --dbname=wordpress --dbuser=root --path=wordpress/
             wp config set WP_DEBUG true --path=wordpress/
             wp config set WP_DEBUG_LOG /tmp/wp-debug.log --path=wordpress/
