@@ -21,6 +21,7 @@ jobs:
           command: |
             sudo apt update
             sudo apt install -y mariadb-server
+            sudo apt install -y libgd-dev
             curl -o wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
             chmod +x wp
             sudo mv wp /usr/local/bin
