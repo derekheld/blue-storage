@@ -15,7 +15,6 @@ class BlueStorageSettings
     public static $PluginName = 'Blue Storage';
     public static $MenuSlug = 'blue-storage';
     public static $BlueStorageSettingsGroup = 'blue-storage-group';
-    public static $BlueStorageSettingsTitle = 'Blue Storage Options';
     public static $PluginOptionsPage = 'blue-storage-options';
     public static $StorageAccountNameSlug = 'azure_storage_account_name';
     public static $StorageAccountKeySlug = 'azure_storage_account_primary_access_key';
@@ -57,15 +56,15 @@ class BlueStorageSettings
     public static function settings_init()
     {
         //Create settings group
-        add_settings_section( self::$BlueStorageSettingsGroup, self::$BlueStorageSettingsTitle, array(static::class, 'plugin_settings_callback'), self::$PluginOptionsPage );
+        add_settings_section( self::$BlueStorageSettingsGroup, esc_html__('Blue Storage Options', 'blue-storage'), array(static::class, 'plugin_settings_callback'), self::$PluginOptionsPage );
 
         //Create all the settings
-        add_settings_field( self::$StorageAccountNameSlug, 'Storage Account Name', array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccountNameSlug, 'type' => 'text') );
-        add_settings_field( self::$StorageAccountKeySlug, 'Private Access Key', array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccountKeySlug, 'type' => 'text') );
-        add_settings_field( self::$StorageAccountContainerSlug, 'Selected Container', array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccountContainerSlug, 'type' => 'text') );
-        add_settings_field( self::$AzureAsDefaultUploadSlug, 'Use Azure Storage by default', array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$AzureAsDefaultUploadSlug, 'type'=> 'checkbox') );
-        add_settings_field( self::$MaxCacheSlug, 'Max cache timeout', array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$MaxCacheSlug, 'type' => 'text') );
-        add_settings_field( self::$CnameSlug, 'URL CNAME', array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$CnameSlug, 'type' => 'text') );
+        add_settings_field( self::$StorageAccountNameSlug, esc_html__('Storage Account Name','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccountNameSlug, 'type' => 'text') );
+        add_settings_field( self::$StorageAccountKeySlug, esc_html__('Private Access Key','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccountKeySlug, 'type' => 'text') );
+        add_settings_field( self::$StorageAccountContainerSlug, esc_html__('Selected Container','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccountContainerSlug, 'type' => 'text') );
+        add_settings_field( self::$AzureAsDefaultUploadSlug, esc_html__('Use Azure Storage by default','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$AzureAsDefaultUploadSlug, 'type'=> 'checkbox') );
+        add_settings_field( self::$MaxCacheSlug, esc_html__('Max cache timeout','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$MaxCacheSlug, 'type' => 'text') );
+        add_settings_field( self::$CnameSlug, esc_html__('URL CNAME','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$CnameSlug, 'type' => 'text') );
 
         //Now register all the settings
         register_setting( self::$BlueStorageSettingsGroup, self::$StorageAccountNameSlug );
@@ -81,7 +80,7 @@ class BlueStorageSettings
         echo '<form name="CopyToAzure" style="margin: 20px;" method="post" action="'.$_SERVER['REQUEST_URI'].'">
             <input type="hidden" name="CopyToAzure" value="true" />
             <input type="hidden" name="selected_container" value="'.get_option('default_azure_storage_account_container_name').'/>
-            <label style="font-weight: bold;">Copy local media to "'.get_option('default_azure_storage_account_container_name').'" container</label>
+            <label style="font-weight: bold;">'.esc_html__('Copy local media to ','blue-storage').get_option('default_azure_storage_account_container_name').'</label>
             <br/>Be careful running this. This can take a long time to finish. Make sure your PHP script execution time limit allows you enough time.
             <br/>If the script is stopped before finishing the current file it is working on may be broken and have to be deleted and reuploaded.
             <br/>The process will also attempt to fix any newly broken links. It may not fix everything and you may have links that break.
@@ -104,7 +103,7 @@ class BlueStorageSettings
 
             if( !empty($query_results) )
             {
-                echo '<p id="blue-storage-notice">Preparing to copy files...</p>';
+                echo '<p id="blue-storage-notice">'.esc_html__('Preparing to copy files...','blue-storage').'</p>';
                 echo '<br/><br/><div id="blue-storage-progress-container"></div>';
                 echo '<div id="blue-storage-progress-information"></div>';
                 $count = 0;
@@ -174,7 +173,7 @@ class BlueStorageSettings
 
     public static function plugin_settings_callback()
     {
-        echo '<p>These options control how Blue Storage works within your WordPress site</p>';
+        echo '<p>'.esc_html__('These options control how Blue Storage works within your WordPress site','blue-storage').'</p>';
     }
 
     public static function input_callback( $args )
