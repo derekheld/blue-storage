@@ -214,18 +214,18 @@ class AzureStorageClient
     {
         $blockList = array();
 
-        if( $size = filesize($path) )
+        if( !$size = filesize($path) )
         {
             //Without size we can't calculate whether our number of blocks will exceed the limit
             throw new Exception( 'Unable to get size of '.$path, 1 );
         }
 
-        if( $contentType = mime_content_type($path) )
+        if( !$contentType = mime_content_type($path) )
         {
             $contentType = '';
         }
 
-        if( $contentMD5 = md5_file($path) )
+        if( !$contentMD5 = md5_file($path) )
         {
             $contentMD5 = '';
         }
