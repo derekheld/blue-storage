@@ -19,6 +19,7 @@ Features being added:
 * Performance tuning settings
 * Authentication with Azure AD
 * Multi-site support
+* Localization support
 
 Features being removed:
 * Compatibility with [originally forked plugin](https://wordpress.org/plugins/windows-azure-storage/)
