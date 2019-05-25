@@ -1,8 +1,8 @@
 === Blue Storage ===
 Contributors: derekheld
 Tags: Microsoft, Microsoft Azure, Azure Storage, Azure, Media Files, Upload, Blob
-Requires at least: 2.8.0
-Tested up to: 4.5
+Requires at least: 4.6
+Tested up to: 5.2
 
 Stable tag: 2.0.0
 
