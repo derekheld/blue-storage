@@ -35,24 +35,26 @@ class AzureStorageClient
      * @param string $container
      *
      * @param integer $blockSize
+     *
+     * @throws Exception
      */
     function __construct( $account, $key, $container, $blockSize = 4096 )
     {
         if( !$this->class_set_account($account) )
         {
-            return false;
+            throw new Exception( 'Account name failed validation' );
         }
         if( !$this->class_set_key($key) )
         {
-            return false;
+            throw new Exception( 'Private key failed validation' );
         }
         if( !$this->class_set_container($container) )
         {
-            return false;
+            throw new Exception( 'Container name failed validation' );
         }
         if( !$this->class_set_block_size($blockSize) )
         {
-            return false;
+            throw new Exception( 'Block size not within allowable range' );
         }
     }
 
