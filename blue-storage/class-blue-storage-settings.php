@@ -16,12 +16,12 @@ class BlueStorageSettings
     public static $MenuSlug = 'blue-storage';
     public static $BlueStorageSettingsGroup = 'blue-storage-group';
     public static $PluginOptionsPage = 'blue-storage-options';
-    public static $StorageAccountNameSlug = 'azure_storage_account_name';
-    public static $StorageAccountKeySlug = 'azure_storage_account_primary_access_key';
-    public static $StorageAccountContainerSlug = 'default_azure_storage_account_container_name';
-    public static $AzureAsDefaultUploadSlug = 'azure_storage_use_for_default_upload';
-    public static $MaxCacheSlug = 'max_cache';
-    public static $CnameSlug = 'cname';
+    public static $StorageAccountNameSlug = 'blue-storage-account-name';
+    public static $StorageAccountKeySlug = 'blue-storage-account-access-key';
+    public static $StorageAccountContainerSlug = 'blue-storage-container-name';
+    public static $AzureAsDefaultUploadSlug = 'blue-storage-default-upload-to-azure';
+    public static $MaxCacheSlug = 'blue-storage-max-cache';
+    public static $CnameSlug = 'blue-storage-cname';
 
     public static function init()
     {
