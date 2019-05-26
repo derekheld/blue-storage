@@ -36,16 +36,6 @@ class BlueStorageSettings
 
     public static function options_page()
     {
-        if( BlueStorageConst::ALLOW_DELETE_ALL )
-        {
-            self::delete_files_form();
-        }
-
-        if( BlueStorageConst::ALLOW_COPY_TO_AZURE )
-        {
-            self::copy_to_azure_form();
-        }
-        
         echo '<form method="post" action="options.php">';
         settings_fields( self::$BlueStorageSettingsGroup );
         do_settings_sections(self::$PluginOptionsPage);
