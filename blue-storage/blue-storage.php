@@ -9,7 +9,6 @@
  *
  */
 
-require_once( 'class-blue-storage-const.php' );
 require_once( 'class-blue-storage-settings.php' );
 require_once( 'class-azure-storage-client.php' );
 require_once( 'class-blue-storage-utility.php' );
