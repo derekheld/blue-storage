@@ -17,8 +17,8 @@ class BlueStorageSettings
     public static $BlueStorageSettingsGroup = 'blue-storage-group';
     public static $PluginOptionsPage = 'blue-storage-options';
     public static $StorageAccountNameSlug = 'blue-storage-account-name';
-    public static $StorageAccountKeySlug = 'blue-storage-account-access-key';
-    public static $StorageAccountContainerSlug = 'blue-storage-container-name';
+    public static $StorageAccessKeySlug = 'blue-storage-access-key';
+    public static $StorageContainerSlug = 'blue-storage-container-name';
     public static $AzureAsDefaultUploadSlug = 'blue-storage-default-upload-to-azure';
     public static $MaxCacheSlug = 'blue-storage-max-cache';
     public static $CnameSlug = 'blue-storage-cname';
@@ -60,16 +60,16 @@ class BlueStorageSettings
 
         //Create all the settings
         add_settings_field( self::$StorageAccountNameSlug, esc_html__('Storage Account Name','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccountNameSlug, 'type' => 'text') );
-        add_settings_field( self::$StorageAccountKeySlug, esc_html__('Private Access Key','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccountKeySlug, 'type' => 'text') );
-        add_settings_field( self::$StorageAccountContainerSlug, esc_html__('Selected Container','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccountContainerSlug, 'type' => 'text') );
+        add_settings_field( self::$StorageAccessKeySlug, esc_html__('Private Access Key','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageAccessKeySlug, 'type' => 'text') );
+        add_settings_field( self::$StorageContainerSlug, esc_html__('Selected Container','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$StorageContainerSlug, 'type' => 'text') );
         add_settings_field( self::$AzureAsDefaultUploadSlug, esc_html__('Use Azure Storage by default','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$AzureAsDefaultUploadSlug, 'type'=> 'checkbox') );
         add_settings_field( self::$MaxCacheSlug, esc_html__('Max cache timeout','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$MaxCacheSlug, 'type' => 'text') );
         add_settings_field( self::$CnameSlug, esc_html__('URL CNAME','blue-storage'), array(static::class, 'input_callback'), self::$PluginOptionsPage, self::$BlueStorageSettingsGroup, array('slug' => self::$CnameSlug, 'type' => 'text') );
 
         //Now register all the settings
         register_setting( self::$BlueStorageSettingsGroup, self::$StorageAccountNameSlug );
-        register_setting( self::$BlueStorageSettingsGroup, self::$StorageAccountKeySlug );
-        register_setting( self::$BlueStorageSettingsGroup, self::$StorageAccountContainerSlug );
+        register_setting( self::$BlueStorageSettingsGroup, self::$StorageAccessKeySlug );
+        register_setting( self::$BlueStorageSettingsGroup, self::$StorageContainerSlug );
         register_setting( self::$BlueStorageSettingsGroup, self::$AzureAsDefaultUploadSlug );
         register_setting( self::$BlueStorageSettingsGroup, self::$MaxCacheSlug );
         register_setting( self::$BlueStorageSettingsGroup, self::$CnameSlug );
