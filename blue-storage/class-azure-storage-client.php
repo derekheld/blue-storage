@@ -393,11 +393,7 @@ class AzureStorageClient
     /**
      * Generates a base64 encoded random ID to use as a block ID
      *
-     * @param string $blobName The blob name
-     *
-     * @return bool true if it exists, false if it does not
-     *
-     * @throws Exception
+     * @return string
      */
     protected function generate_block_id( )
     {
