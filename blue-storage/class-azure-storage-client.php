@@ -8,7 +8,8 @@
  */
 
 namespace BlueStorage;
-use Exception;
+use InvalidArgumentException;
+use RuntimeException;
 use Httpful\Request;
 
 require_once( 'class-azure-headers.php' );
@@ -36,25 +37,25 @@ class AzureStorageClient
      *
      * @param integer $blockSize
      *
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
     function __construct( $account, $key, $container, $blockSize = 4096 )
     {
         if( !$this->class_set_account($account) )
         {
-            throw new Exception( 'Account name failed validation' );
+            throw new InvalidArgumentException( 'Account name failed validation' );
         }
         if( !$this->class_set_key($key) )
         {
-            throw new Exception( 'Private key failed validation' );
+            throw new InvalidArgumentException( 'Private key failed validation' );
         }
         if( !$this->class_set_container($container) )
         {
-            throw new Exception( 'Container name failed validation' );
+            throw new InvalidArgumentException( 'Container name failed validation' );
         }
         if( !$this->class_set_block_size($blockSize) )
         {
-            throw new Exception( 'Block size not within allowable range' );
+            throw new InvalidArgumentException( 'Block size not within allowable range' );
         }
     }
 
@@ -208,7 +209,7 @@ class AzureStorageClient
      *
      * @return boolean
      *
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function put_block_blob( $blobName, $path, $cacheControl = NULL, $metadata = array() )
     {
@@ -217,7 +218,7 @@ class AzureStorageClient
         if( !$size = filesize($path) )
         {
             //Without size we can't calculate whether our number of blocks will exceed the limit
-            throw new Exception( 'Unable to get size of '.$path, 1 );
+            throw new RuntimeException( 'Unable to get size of '.$path, 1 );
         }
 
         if( !$contentType = mime_content_type($path) )
@@ -232,13 +233,13 @@ class AzureStorageClient
 
         if( $size > (self::class_get_block_size() * self::MAX_NUM_BLOCKS) )
         {
-            throw new Exception( 'Block size too small to upload file ' . $path, 1 );
+            throw new RuntimeException( 'Block size too small to upload file ' . $path, 1 );
         }
 
         $handle = fopen( $path, 'rb' );
         if( $handle === false )
         {
-            throw new Exception( 'Unable to open file for reading', 1 );
+            throw new RuntimeException( 'Unable to open file for reading', 1 );
         }
 
         while( $content = fread($handle, self::class_get_block_size()) )
@@ -262,7 +263,7 @@ class AzureStorageClient
      * @param mixed $content Whatever content is to be uploaded
      * @return bool true on success, false on error
      *
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function put_block( $blobName, $blockID, $content )
     {
@@ -280,7 +281,7 @@ class AzureStorageClient
                             ->send();
         if( $response->code != 201 )
         {
-            throw new Exception( 'Unable to put block. Request ID: '.$headers->get_header( 'x-ms-client-request-id' ), $response->code );
+            throw new RuntimeException( 'Unable to put block. Request ID: '.$headers->get_header( 'x-ms-client-request-id' ), $response->code );
         }
         else
         {
@@ -296,7 +297,7 @@ class AzureStorageClient
      *
      * @return bool true on success, false on error
      *
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function put_block_list( $blobName, $blockList, $cacheControl, $contentType, $contentMD5 )
     {
@@ -321,7 +322,7 @@ class AzureStorageClient
 
         if( $response->code != 201 )
         {
-            throw new Exception( 'Unable to put block. Request ID: '.$headers->get_header( 'x-ms-client-request-id' ), $response->code );
+            throw new RuntimeException( 'Unable to put block. Request ID: '.$headers->get_header( 'x-ms-client-request-id' ), $response->code );
         }
         else
         {
@@ -336,7 +337,7 @@ class AzureStorageClient
 	 *
 	 * @return string unique blob name
      * 
-	 * @throws Exception
+	 * @throws RuntimeException
 	 */
     public function get_unique_blob_name( $blobName )
     {
@@ -366,7 +367,7 @@ class AzureStorageClient
      *
      * @return bool true if it exists, false if it does not
      *
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function blob_exists( $blobName )
     {
@@ -385,7 +386,7 @@ class AzureStorageClient
         }
         else
         {
-            throw new Exception( 'Unable to check for blob name. Request ID: '.$headers->get_header( 'x-ms-client-request-id' ), $response->code );
+            throw new RuntimeException( 'Unable to check for blob name. Request ID: '.$headers->get_header( 'x-ms-client-request-id' ), $response->code );
         }
     }
 
