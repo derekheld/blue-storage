@@ -23,18 +23,27 @@ class BlueStorageSettings
     public static $MaxCacheSlug = 'blue-storage-max-cache';
     public static $CnameSlug = 'blue-storage-cname';
 
-    public static function init()
+    /**
+     * Initiates settings and adds submenu for option page
+     */
+    public static function init( )
     {
         add_action('admin_menu', array(static::class, 'options_menu'));
         add_action('admin_init', array(static::class, 'settings_init'));
     }
 
-    public static function options_menu()
+    /**
+     * Creates submenu in WordPress' settings area for the Plugin and sets callback
+     */
+    public static function options_menu( )
     {
         add_submenu_page('options-general.php', self::$PluginName, self::$PluginName, 'manage_options', self::$MenuSlug, array(static::class, 'options_page'));
     }
 
-    public static function options_page()
+    /**
+     * Output of the plugin's options page
+     */
+    public static function options_page( )
     {
         echo '<form method="post" action="options.php">';
         settings_fields( self::$BlueStorageSettingsGroup );
@@ -43,7 +52,10 @@ class BlueStorageSettings
         echo '</form>';
     }
 
-    public static function settings_init()
+    /**
+     * Responsible for defining all the settings used by the plugin
+     */
+    public static function settings_init( )
     {
         //Create settings group
         add_settings_section( self::$BlueStorageSettingsGroup, esc_html__('Blue Storage Options', 'blue-storage'), array(static::class, 'plugin_settings_callback'), self::$PluginOptionsPage );
@@ -65,11 +77,19 @@ class BlueStorageSettings
         register_setting( self::$BlueStorageSettingsGroup, self::$CnameSlug );
     }
 
-    public static function plugin_settings_callback()
+    /**
+     * This callback function is what gets placed underneath the page title
+     */
+    public static function plugin_settings_callback( )
     {
         echo '<p>'.esc_html__('These options control how Blue Storage works within your WordPress site','blue-storage').'</p>';
     }
 
+    /**
+     * Called by WordPress through do_settings_sections() and outputs our HTML that we want on our page.
+     *
+     * @param $args
+     */
     public static function input_callback( $args )
     {
         $checked = '';
